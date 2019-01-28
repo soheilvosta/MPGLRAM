@@ -1,0 +1,16 @@
+%% Classification Kfold fitdiscr 
+function accuracy_kfold=KFOLDCLASS(gnd,X,KF) %gnd:label, X: data, k_f: kfold
+XX=X';
+CVO = cvpartition(gnd,'KFold',KF);
+err = zeros(CVO.NumTestSets,1);
+for i = 1:CVO.NumTestSets
+    trIdx = CVO.training(i);
+    teIdx = CVO.test(i);
+    obj = fitcdiscr(X(trIdx,:),gnd(trIdx,:));
+    [ytest,score,cost] = predict(obj,X(teIdx,:));
+    err(i) = nnz(ytest-gnd(teIdx));
+end
+
+cvErr = sum(err)/sum(CVO.TestSize);
+accuracy_kfold =1-cvErr;
+end
